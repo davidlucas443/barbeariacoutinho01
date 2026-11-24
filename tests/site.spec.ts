@@ -9,15 +9,17 @@ for(const width of [360,390,1440])test(`Layout e navegação ${width}px`,async({
  await expect(page.locator('.hero').getByRole('link',{name:'Agendar corte',exact:true})).toBeInViewport();
  await expect(page.locator('canvas,.pin-spacer')).toHaveCount(0);
  await expect(page.locator('.haircut-gallery')).toHaveCount(0);
+ await expect(page.locator('.header img')).toHaveAttribute('alt','Barbearia Coutinho');
+ await page.locator('.header img').evaluate((e:HTMLImageElement)=>e.decode());
  await page.locator('.pole-structure').evaluate((e:HTMLImageElement)=>e.decode());
  await expect(page.locator('.hero-stripe')).toHaveCount(0);
  if(width===390)await page.waitForTimeout(700);
- if(width===1440)await page.screenshot({path:'artifacts/pole-sem-suporte/desktop.png'});
- if(width===390)await page.screenshot({path:'artifacts/pole-sem-suporte/abertura-390.png'});
+ if(width===1440)await page.screenshot({path:'artifacts/pole-cromado-header/desktop.png'});
+ if(width===390)await page.screenshot({path:'artifacts/pole-cromado-header/abertura-390.png'});
  await page.getByRole('link',{name:'Conhecer o curso',exact:true}).click();await expect(page.locator('#curso')).toBeInViewport();
  await page.waitForTimeout(700);
  await expect.poll(async()=>Number(await page.locator('.school-stat').evaluate(e=>getComputedStyle(e).opacity))).toBeGreaterThan(.95);
- if(width===390)await page.locator('#curso').screenshot({path:'artifacts/pole-sem-suporte/curso-390.png'});
+ if(width===390)await page.locator('#curso').screenshot({path:'artifacts/pole-cromado-header/curso-390.png'});
  const course=await page.getByRole('link',{name:'Consultar próximas turmas'}).getAttribute('href');
  const cut=await page.getByRole('link',{name:'Agendar meu corte'}).getAttribute('href');
  expect(course).toContain('https://wa.me/5511948716883?text=');expect(decodeURIComponent(course!)).toContain('curso de barbeiro');expect(decodeURIComponent(cut!)).toContain('agendar um corte');expect(course).not.toBe(cut);
@@ -25,8 +27,8 @@ for(const width of [360,390,1440])test(`Layout e navegação ${width}px`,async({
  await expect(page.getByRole('heading',{name:'Nora Ney – Socorro'})).toBeVisible();
  await expect(page.getByRole('link',{name:'Ver rota'})).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
- if(width<600){const logo=await page.locator('.header .compact-logo').boundingBox();expect(logo!.width).toBeGreaterThanOrEqual(28);expect(logo!.width).toBeLessThanOrEqual(32);await expect(page.locator('.header')).toContainText('Desde 2014');}
- await page.locator('#unidades').screenshot({path:`artifacts/pole-sem-suporte/unidades-${width}.png`}); await page.screenshot({path:`artifacts/pole-sem-suporte/pagina-${width}.png`,fullPage:true});expect(errors).toEqual([]);
+ if(width<600){const logo=await page.locator('.header .official-mark').boundingBox();expect(logo!.width).toBeGreaterThanOrEqual(56);expect(logo!.width).toBeLessThanOrEqual(56);await expect(page.locator('.header')).not.toContainText('Desde 2014');}
+ await page.locator('#unidades').screenshot({path:`artifacts/pole-cromado-header/unidades-${width}.png`}); await page.screenshot({path:`artifacts/pole-cromado-header/pagina-${width}.png`,fullPage:true});expect(errors).toEqual([]);
 });
 test('Movimento reduzido e cena estática',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');

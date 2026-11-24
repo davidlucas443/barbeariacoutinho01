@@ -13,13 +13,30 @@ export default function App(){
   useEffect(()=>{
     const mm=gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)',()=>{
-      gsap.timeline({scrollTrigger:{trigger:'#curso',start:'top 98%',end:'top 55%',scrub:true}})
-        .fromTo('.school-stat',{y:24,opacity:.35},{y:0,opacity:1,ease:'none'},0);
+      const mobile=()=>window.innerWidth<900;
+      // The stable wrapper keeps anchor destinations independent of the moving panel.
+      gsap.timeline({scrollTrigger:{trigger:'.school-stage',start:'top bottom',end:()=>mobile()?'top 58%':'top 48%',scrub:true,invalidateOnRefresh:true}})
+        .fromTo('.school',{y:()=>mobile()?48:96},{y:0,ease:'none',duration:1},0)
+        .fromTo('.school-stat',{y:()=>mobile()?18:30,opacity:.2},{y:0,opacity:1,ease:'none',duration:.85},.15);
+      for(const [trigger,content] of [['#barbearia','.barber-main'],['#unidades','.units-heading, .unit-grid']]){
+        gsap.fromTo(content,{y:()=>mobile()?14:26},{y:0,ease:'none',scrollTrigger:{trigger,start:'top 96%',end:'top 68%',scrub:true,invalidateOnRefresh:true}});
+      }
     },root);
     mm.add('(min-width: 900px) and (min-height: 720px) and (prefers-reduced-motion: no-preference)',()=>{
-      const lenis=new Lenis({autoRaf:false,syncTouch:false,anchors:true});
+      const lenis=new Lenis({autoRaf:false,syncTouch:false,anchors:false});
       const tick=(time:number)=>lenis.raf(time*1000);lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(tick);
-      return()=>{gsap.ticker.remove(tick);lenis.destroy();};
+      const navigate=(event:MouseEvent)=>{
+        if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+        const link=(event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+        const target=link&&document.querySelector<HTMLElement>(link.hash);
+        if(!target)return;
+        event.preventDefault();
+        history.pushState(null,'',link!.hash);
+        lenis.scrollTo(target.getBoundingClientRect().top+window.scrollY,{offset:-18,duration:.65,force:true,onComplete:()=>{target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}});
+      };
+      root.current?.addEventListener('click',navigate);
+      const element=root.current;
+      return()=>{element?.removeEventListener('click',navigate);gsap.ticker.remove(tick);lenis.destroy();};
     },root);
     return()=>mm.revert();
   },[]);
@@ -34,10 +51,11 @@ export default function App(){
         <div className="hero-visual"><BarberPole/></div>
         <div className="hero-bottom"><span>TÉCNICA QUE TRANSFORMA.</span><a href="#curso">O futuro começa com um ofício <span aria-hidden="true">↓</span></a></div>
       </section>
-      <section id="curso" className="school">
+      <div id="curso" className="school-stage"><section className="school" aria-label="Escola Coutinho">
         <div className="section-top"><p className="eyebrow">ESCOLA PROFISSIONALIZANTE DE BARBEIRO</p><span>CONHECIMENTO QUE FICA.</span></div>
         <div className="school-grid"><div className="school-title"><h2>Aprenda um ofício.<br/>Construa <em>seu futuro.</em></h2><div className="school-stat"><strong>+100</strong><span>alunos<br/>formados</span></div><p className="stat-note">Histórias que começam com a vontade de aprender.</p></div><div className="school-info"><h3>O próximo passo <br/>está nas suas mãos.</h3><p>Conheça a Escola Coutinho e descubra as próximas oportunidades para aprender a arte do corte.</p><dl className="course-details">{Object.entries({'Duração':course.duration,'Carga horária':course.hours,'Investimento':course.price,'Próximas turmas':course.dates}).filter(([,v])=>v).map(([key,value])=><div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl>{course.content.length>0&&<div className="course-content"><h4>Conteúdo do curso</h4><ul>{course.content.map(item=><li key={item}>{item}</li>)}</ul></div>}<a className="button" href={whatsappLink('course')} target="_blank" rel="noreferrer">Consultar próximas turmas</a><small>Converse diretamente com a escola pelo WhatsApp.</small></div></div>
       </section>
+      </div>
       <section id="barbearia" className="barber"><div className="barber-main"><div><p className="eyebrow">BARBEARIA COUTINHO</p><h2>Desde 2014,<br/><em>transformando estilos.</em></h2><p>Um novo corte. Uma nova versão de você.<br/>Reserve seu próximo horário com a Coutinho.</p><a className="button" href={whatsappLink('cut')} target="_blank" rel="noreferrer">Agendar meu corte</a></div><div className="barber-stat"><strong>+25 mil</strong><span>mudanças de visual.</span><p>Uma trajetória construída<br/>um corte de cada vez.</p></div></div><HaircutGallery/></section>
       <Units/>
     </main><footer><Brand full/><div className="footer-links"><a href={`https://www.instagram.com/${config.instagram}/`} target="_blank" rel="noreferrer">@{config.instagram}</a><a href={whatsappLink('cut')} target="_blank" rel="noreferrer">WhatsApp</a></div><small>São Paulo · Feito de técnica e atitude.</small></footer>
