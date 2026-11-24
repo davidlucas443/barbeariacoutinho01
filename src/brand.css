@@ -1,0 +1,4 @@
+.official-mark{position:relative;display:block;width:56px;aspect-ratio:980 / 990;overflow:hidden;flex-shrink:0;mix-blend-mode:screen}
+.official-mark .official-logo{position:absolute;left:-5.102%;top:-7.071%;width:110.204%;height:auto;max-width:none;filter:grayscale(1) contrast(1.2)}
+@media(min-width:600px){.header .official-mark{width:64px}}
+.brand-full .official-mark{width:90px}
