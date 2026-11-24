@@ -77,3 +77,15 @@ Referência de ritmo observada em celular e desktop: https://viudespratas.vercel
 Lenis continua apenas no desktop, no ticker do GSAP. Âncoras usam a posição absoluta do alvo com offset de 18 px, evitando disputa entre animação nativa e Lenis. No celular, navegação e gesto vertical permanecem nativos.
 
 Vídeo mobile nos dois sentidos e acesso pelo botão: artifacts/transicoes/abertura-escola-390.webm. Testes em tests/transitions.spec.ts cobrem reversibilidade em 360/390/1440, âncoras e movimento reduzido. Para regravar, execute com RECORD_SCROLL=1 e FFmpeg instalado no caminho do Playwright.
+
+## Página de links do Instagram — /bio
+
+Acesse http://127.0.0.1:5173/bio após npm run dev. Ainda não foi realizado deploy desta rota; após publicar, use o domínio atual do site seguido de /bio.
+
+Bio.tsx usa o mesmo Emblem e as mesmas funções whatsappLink/unitCutLink de src/config.ts. As quatro ações seguem a ordem curso, Unidade I, Unidade II e página principal. Contatos e mensagens continuam editáveis somente na configuração compartilhada.
+
+O build gera duas entradas HTML: dist/index.html e dist/bio/index.html. A entrada src/bio-main.tsx não importa App, GSAP, Lenis ou BarberPole; React, fontes e identidade são compartilhados. O logo tem seus estilos em src/brand.css.
+
+Vite serve /bio diretamente no desenvolvimento e no preview. vercel.json reescreve exclusivamente /bio e /bio/ para /bio/index.html, sem capturar / ou assets. Configuração baseada em https://vercel.com/docs/routing/rewrites. Em outras hospedagens, sirva o índice do diretório bio ou configure esse mesmo mapeamento específico.
+
+Validação em 360 e 390 px: URL direta, reload, quatro destinos, mensagens UTF-8, ausência das dependências da abertura e retorno para /. A versão de produção foi testada com vite preview na porta 4173. Para repetir: npm run build, npm exec vite preview -- --host 127.0.0.1 --port 4173 e BIO_BASE_URL=http://127.0.0.1:4173 nos testes bio. Capturas em artifacts/bio/. O navegador interno real do Instagram ainda não foi testado.
